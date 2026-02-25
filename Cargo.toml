@@ -1,0 +1,30 @@
+[workspace]
+members = [
+    "crates/sovpool_core",
+    "crates/sovpool_assess",
+    "crates/sovpool_rpc",
+    "crates/sovpool_test",
+    "crates/sovpool_cli",
+    "crates/sovpool_wallet",
+]
+exclude = ["fuzz"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/sovpool/sovpool"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+bitcoin = { version = "0.32", features = ["serde", "rand-std"] }
+bitcoincore-rpc = "0.19"
+clap = { version = "4", features = ["derive"] }
+sovpool_core = { path = "crates/sovpool_core" }
+sovpool_assess = { path = "crates/sovpool_assess" }
+sovpool_rpc = { path = "crates/sovpool_rpc" }
+sovpool_wallet = { path = "crates/sovpool_wallet" }
+proptest = "1"

@@ -1,0 +1,17 @@
+[package]
+name = "sovpool_wallet"
+description = "Pool participation manager — tracks pools, exit paths, and state"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["bitcoin", "ctv", "wallet", "psbt"]
+categories = ["cryptography::cryptocurrencies"]
+readme = "../../README.md"
+
+[dependencies]
+sovpool_core = { workspace = true }
+bitcoin = { workspace = true, features = ["base64"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

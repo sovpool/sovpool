@@ -1,0 +1,118 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --all-targets
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --lib --bins
+      - run: cargo test -p sovpool_assess --test comparison
+
+  test-proptest:
+    name: Property Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test -p sovpool_core --test proptest_pool
+        timeout-minutes: 15
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy -- -W clippy::all -D warnings
+
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: cargo fmt --check
+
+  regtest:
+    name: Regtest Integration
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Download Bitcoin Inquisition
+        run: |
+          ARCH=$(uname -m)
+          if [ "$ARCH" = "x86_64" ]; then
+            PLATFORM="x86_64-linux-gnu"
+          elif [ "$ARCH" = "aarch64" ]; then
+            PLATFORM="aarch64-linux-gnu"
+          fi
+          VERSION="29.2"
+          TAG="v${VERSION}-inq"
+          URL="https://github.com/bitcoin-inquisition/bitcoin/releases/download/${TAG}/bitcoin-${VERSION}-inq-${PLATFORM}.tar.gz"
+          mkdir -p /tmp/bitcoin-inquisition
+          curl -sL "$URL" | tar xz -C /tmp/bitcoin-inquisition --strip-components=1
+          echo "SOVPOOL_BITCOIND=/tmp/bitcoin-inquisition/bin/bitcoind" >> $GITHUB_ENV
+
+      - name: Run regtest tests
+        run: cargo test -p sovpool_test --features ctv-regtest -- --nocapture --test-threads=1
+        timeout-minutes: 10
+
+  fuzz:
+    name: Fuzz
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz
+      - name: Fuzz ctv_hash (60s)
+        run: cargo +nightly fuzz run ctv_hash -- -max_total_time=60
+        timeout-minutes: 5
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for sensitive files
+        run: |
+          # No .env files, private keys, or credentials
+          ! find . -name "*.pem" -o -name "*.key" -o -name ".env" | grep -v target | grep .
+      - name: Check .gitignore
+        run: |
+          grep -q "\.env" .gitignore
+          grep -q "\.pem" .gitignore
+          grep -q "\.key" .gitignore

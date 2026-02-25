@@ -1,0 +1,15 @@
+[package]
+name = "sovpool_assess"
+description = "Sovereignty assessment framework for Bitcoin scaling protocols"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["bitcoin", "sovereignty", "assessment", "covenant"]
+categories = ["cryptography::cryptocurrencies"]
+readme = "../../README.md"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

@@ -1,0 +1,21 @@
+[package]
+name = "sovpool_test"
+description = "Integration test harness for sovpool on regtest/signet"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+ctv-regtest = []
+signet = []
+
+[dependencies]
+sovpool_core = { workspace = true }
+sovpool_rpc = { workspace = true }
+bitcoin = { workspace = true }
+bitcoincore-rpc = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

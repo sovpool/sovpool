@@ -1,0 +1,25 @@
+[package]
+name = "sovpool_cli"
+description = "CLI tool for sovpool CTV payment pools"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["bitcoin", "ctv", "covenant", "payment-pool"]
+categories = ["cryptography::cryptocurrencies"]
+readme = "../../README.md"
+
+[[bin]]
+name = "sovpool"
+path = "src/main.rs"
+
+[dependencies]
+sovpool_core = { workspace = true }
+sovpool_assess = { workspace = true }
+sovpool_rpc = { workspace = true }
+sovpool_wallet = { workspace = true }
+bitcoin = { workspace = true }
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

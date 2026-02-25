@@ -1,0 +1,18 @@
+[package]
+name = "sovpool_rpc"
+description = "Bitcoin Core RPC wrapper with sovpool-specific operations"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["bitcoin", "ctv", "rpc", "bitcoind"]
+categories = ["cryptography::cryptocurrencies"]
+readme = "../../README.md"
+
+[dependencies]
+sovpool_core = { workspace = true }
+bitcoin = { workspace = true }
+bitcoincore-rpc = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
